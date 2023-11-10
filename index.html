@@ -1,0 +1,259 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style/index.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+<body>
+    <h1 class="main-title">crud-operation-in-firebase</h1>
+<div class="main" >
+   
+  
+    <div class="form-section shadow-lg p-9 bg-body-tertiary rounded">
+        <div class="title">
+            <h1 style="margin-left: 2%; margin-bottom: 2%;">customer-manage</h1>
+        </div>
+        <form action="" id ="formDetails">
+                <div class="mb-3 ">
+                    <label for="userId" class="form-label">user Id</label>
+                    <input type="number" class="form-control" id="userId">
+                    <div id="emailHelp" class="form-text">enter ur id.</div>
+                </div>
+                <div class="mb-3 ">
+                    <label for="firstName" class="form-label">first name</label>
+                    <input type="text" class="form-control" id="firstName" >
+                    <div id="emailHelp" class="form-text">enter ur first name.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="lasttName" class="form-label">last name</label>
+                    <input type="text" class="form-control" id="lastName" >
+                    <div id="emailHelp" class="form-text">enter ur last name.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="age" class="form-label">age</label>
+                    <input type="text" class="form-control" id="age" >
+                    <div id="emailHelp" class="form-text">enter ur age.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="address" class="form-label">address</label>
+                    <input type="text" class="form-control" id="address" >
+                    <div id="emailHelp" class="form-text">enter ur address.</div>
+                </div>
+    
+        <button type="button" class="btn btn-primary" id="submit">save</button>
+        <button type="button" class="btn btn-success" id="btnupdate">update</button>
+        <button type="button" class="btn btn-danger" id="btndelete">delete</button>
+        <button type="button" class="btn btn-warning" id="btnsearch">search</button>
+        </form>
+</div>
+
+<div class="table-area">
+                                            <table class="table" id="user">
+                                                <thead>
+                                                    <tr>
+                                                        <th >id</th>
+                                                        <th >first name</th>
+                                                        <th >last name</th>
+                                                        <th>age</th>
+                                                        <th >address</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tbodyData">
+                                            
+                                                </tbody>
+                                            
+                                            <!-- </table> -->
+                </table>
+</div>
+</div>
+    <script src="jquery-3.6.1.min.js"></script>
+    <script src="./script/index.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
+        <!-- Firebase App (the core Firebase SDK) -->
+        <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-app.js"></script>
+
+        <!-- Firebase Storage -->
+        <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-storage.js"></script>
+
+        <script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-database.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+
+
+   <script type="module">
+        // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyASdZbTizGh1XoioID28KGe-0BG8KkMpsA",
+        authDomain: "fire9db-63e87.firebaseapp.com",
+        databaseURL: "https://fire9db-63e87-default-rtdb.firebaseio.com",
+        projectId: "fire9db-63e87",
+        storageBucket: "fire9db-63e87.appspot.com",
+        messagingSenderId: "520615579420",
+        appId: "1:520615579420:web:b9effb894d54f9272ff4d9"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+   
+   $(document).ready(function () {
+         getAllData();
+         $('#tbodyData > tr').click(function () {
+            alert('click row')
+           let userId = $(this).children(":eq(0)").text();
+           let fName = $(this).children(":eq(1)").text();
+           let lName = $(this).children(":eq(2)").text();
+           let age = $(this).children(":eq(3)").text();
+           let address = $(this).children(":eq(4)").text();
+           console.log('====================================');
+           console.log(userId, lName, fName, age, address);
+           console.log('====================================');
+             $('#firstName').val(fName);
+             $('#lastName').val(lName);
+             $('#age').val(age);
+             $('#address').val(address);
+             $('#userId').val(userId);
+   
+       });
+        });
+   
+    var database = firebase.database();
+    var details=firebase.database().ref('fire9db');
+
+$('#submit').click(function(){
+        var fName = $('#firstName').val();
+        var lName = $('#lastName').val();
+        var age = $('#age').val();
+        var add = $('#address').val();
+        var userId=$('#userId').val();
+
+        var newDetails=details.push();
+       newDetails.set({
+            id:userId,
+            firstname: fName,
+            lastname: lName,
+            age: age,
+            address: add
+        });
+       $('#formDetails')[0].reset();
+        alert('save')
+        getAllData();
+    })
+
+function getAllData() {
+            details.once('value', function (snapshot) {
+                var data = snapshot.val();
+                $('#tbodyData').empty();
+                for (let i in data) {
+                    if (data.hasOwnProperty(i)) {
+                        let user = data[i];
+                        $('#tbodyData').append(`<tr><td>` + user.id + `</td><td>` + user.firstname + `</td><td>` + user.lastname + `</td><td>` + user.age + `</td><td>` + user.address + `</td></tr>`);
+                    }
+                }
+            });
+        };
+
+$('#btnupdate').click(function(){
+    var fName = $('#firstName').val();
+    var lName = $('#lastName').val();
+    var age = $('#age').val();
+    var add = $('#address').val();
+    var userId = $('#userId').val();
+  
+   var query = details.orderByChild("id").equalTo(userId);
+    query.once('value', function (snapshot) {
+        if (snapshot.exists()) {
+            var data = snapshot.val();
+            console.log('Data to be updated:', JSON.stringify(data));
+
+            // Get the key of the data to be updated
+            var key = Object.keys(data)[0];
+
+            // Update the data
+            var newData = {
+                id: userId,
+                firstname: fName,
+                lastname: lName,
+                age: age,
+                address: add
+            };
+
+            details.child(key).update(newData)
+                .then(function () {
+                    alert('Data updated successfully.');
+                     getAllData();
+                     $('#formDetails')[0].reset();
+                })
+                .catch(function (error) {
+                    console.error('Error updating data:', error);
+                });
+        } else {
+            console.log('Data does not exist.');
+        }
+    });
+
+
+});
+
+$('#btnsearch').click(function(){
+    var userId = $('#userId').val();
+   var query= details.orderByChild("id").equalTo(userId);
+    query.once('value',function (snapshot) {
+            // Handle the snapshot
+            var data= snapshot.val();
+               for (let i in data) {
+                 if (data.hasOwnProperty(i)) {
+                 let user = data[i];
+                $('#firstName').val(user.firstname);
+                $('#lastName').val(user.lastname);
+                $('#age').val(user.age);
+                $('#address').val(user.address);
+            };
+               };
+        })
+        .catch(function (error) {
+            alert("Error fetching data:", error);
+        });
+});
+$('#btndelete').click(function(){
+    var userId = $('#userId').val();
+   var query= details.orderByChild("id").equalTo(userId);
+    query.once('value', function (snapshot) {
+        if(snapshot.exists()){
+              var data = snapshot.val();
+            console.log('tiynawa'+ JSON.stringify(data));
+            var key = Object.keys(data)[0];
+
+            // Remove the data
+            details.child(key).remove()
+                .then(function () {
+                    alert('Data deleted successfully.');
+                    getAllData();
+                    $('#formDetails')[0].reset();
+                })
+                .catch(function (error) {
+                    console.error('Error deleting data:', error);
+                });
+        }
+
+        
+    });
+})
+
+   </script>
+
+
+</body>
+</html>

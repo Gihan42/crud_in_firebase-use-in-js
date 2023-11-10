@@ -1,0 +1,36 @@
+.main-title{
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 45px;
+    margin-top: 1%;
+}
+.main{
+    padding-left: 2%;
+    padding-top: 0%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: start;
+    align-items:start;
+    gap: 25px;
+    
+}
+.form-section{
+    border-radius: 40px;
+    width: 40%;
+    padding: 4%;
+   
+}
+.title{
+    border-left: 5px solid rgb(0, 128, 255);
+    padding-right: 20px;
+}
+.table-area{
+    padding-top: 5%;
+    width: 40%;
+    margin-left: 10%;
+   
+}
