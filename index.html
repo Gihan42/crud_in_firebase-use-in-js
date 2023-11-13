@@ -239,7 +239,7 @@ function getAllData() {
     function updateDataToDatabase(userId, fName, lName, age, add, imageUrl) {
         var query = details.orderByChild("id").equalTo(userId);
         query.once('value', function (snapshot) {
-            if (snapshot.exists()) {
+            if (snapshot.exists() ) {
                 var data = snapshot.val();
                 console.log('Data to be updated:', JSON.stringify(data));
 
