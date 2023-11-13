@@ -42,7 +42,10 @@
                     <input type="text" class="form-control" id="address" >
                     <div id="emailHelp" class="form-text">enter ur address.</div>
                 </div>
-    
+                    <div class="mb-3">
+                        <label for="image" class="form-label">upload image</label>
+                        <input type="file" class="form-control" id="imageInput">
+                    </div>
         <button type="button" class="btn btn-primary" id="submit">save</button>
         <button type="button" class="btn btn-success" id="btnupdate">update</button>
         <button type="button" class="btn btn-danger" id="btndelete">delete</button>
@@ -59,6 +62,7 @@
                                                         <th >last name</th>
                                                         <th>age</th>
                                                         <th >address</th>
+                                                        
                                                     </tr>
                                                 </thead>
                                                 <tbody id="tbodyData">
@@ -75,13 +79,17 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
         <!-- Firebase App (the core Firebase SDK) -->
-        <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-app.js"></script>
+        <!-- <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-app.js"></script> -->
 
         <!-- Firebase Storage -->
-        <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-storage.js"></script>
+        <!-- <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-storage.js"></script>
 
         <script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-app.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-database.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-database.js"></script> -->
+
+        <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-storage.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
@@ -132,25 +140,59 @@
     var database = firebase.database();
     var details=firebase.database().ref('fire9db');
 
-$('#submit').click(function(){
+            
+
+    $('#submit').click(function () {
+        uploadImage();
+    });
+
+    function uploadImage() {
         var fName = $('#firstName').val();
         var lName = $('#lastName').val();
         var age = $('#age').val();
         var add = $('#address').val();
-        var userId=$('#userId').val();
+        var userId = $('#userId').val();
 
-        var newDetails=details.push();
-       newDetails.set({
-            id:userId,
+        var fileInput = document.getElementById("imageInput");
+        var file = fileInput.files[0];
+        if (file) {
+            // Create a storage reference
+            var storageRef = firebase.storage().ref("images/" + file.name);
+
+            // Upload the file
+            storageRef.put(file).then(function (snapshot) {
+                alert("Image uploaded successfully!");
+
+                // Get the download URL for the image
+                snapshot.ref.getDownloadURL().then(function (downloadURL) {
+                    // Save the download URL in the database
+                    saveDataToDatabase(userId, fName, lName, age, add, downloadURL);
+                });
+            });
+        } else {
+            console.error("No file selected");
+        }
+    }
+
+    function saveDataToDatabase(userId, fName, lName, age, add, imageUrl) {
+        // Get a reference to the database
+        var database = firebase.database();
+
+        // Push the download URL and input field value to the "images" node
+        database.ref("fire9db").push({
+            id: userId,
             firstname: fName,
             lastname: lName,
             age: age,
-            address: add
+            address: add,
+            image: imageUrl
         });
-       $('#formDetails')[0].reset();
-        alert('save')
+        $('#formDetails')[0].reset();
         getAllData();
-    })
+        console.log("Image URL and input value saved to the database");
+    }
+
+  
 
 function getAllData() {
             details.once('value', function (snapshot) {
@@ -165,47 +207,67 @@ function getAllData() {
             });
         };
 
-$('#btnupdate').click(function(){
-    var fName = $('#firstName').val();
-    var lName = $('#lastName').val();
-    var age = $('#age').val();
-    var add = $('#address').val();
-    var userId = $('#userId').val();
-  
-   var query = details.orderByChild("id").equalTo(userId);
-    query.once('value', function (snapshot) {
-        if (snapshot.exists()) {
-            var data = snapshot.val();
-            console.log('Data to be updated:', JSON.stringify(data));
-
-            // Get the key of the data to be updated
-            var key = Object.keys(data)[0];
-
-            // Update the data
-            var newData = {
-                id: userId,
-                firstname: fName,
-                lastname: lName,
-                age: age,
-                address: add
-            };
-
-            details.child(key).update(newData)
-                .then(function () {
-                    alert('Data updated successfully.');
-                     getAllData();
-                     $('#formDetails')[0].reset();
-                })
-                .catch(function (error) {
-                    console.error('Error updating data:', error);
-                });
-        } else {
-            console.log('Data does not exist.');
-        }
+    $('#btnupdate').click(function () {
+        updateImageAndData();
     });
 
+    function updateImageAndData() {
+        var fName = $('#firstName').val();
+        var lName = $('#lastName').val();
+        var age = $('#age').val();
+        var add = $('#address').val();
+        var userId = $('#userId').val();
 
-});
+        var fileInput = document.getElementById("imageInput");
+        var file = fileInput.files[0];
+
+        if (file) {
+            var storageRef = firebase.storage().ref("images/" + file.name);
+
+            storageRef.put(file).then(function (snapshot) {
+                alert("Image uploaded successfully!");
+
+                snapshot.ref.getDownloadURL().then(function (downloadURL) {
+                    updateDataToDatabase(userId, fName, lName, age, add, downloadURL);
+                });
+            });
+        } else {
+            console.error("No file selected");
+        }
+    }
+
+    function updateDataToDatabase(userId, fName, lName, age, add, imageUrl) {
+        var query = details.orderByChild("id").equalTo(userId);
+        query.once('value', function (snapshot) {
+            if (snapshot.exists()) {
+                var data = snapshot.val();
+                console.log('Data to be updated:', JSON.stringify(data));
+
+                var key = Object.keys(data)[0];
+
+                var newData = {
+                    id: userId,
+                    firstname: fName,
+                    lastname: lName,
+                    age: age,
+                    address: add,
+                    image: imageUrl
+                };
+
+                details.child(key).update(newData)
+                    .then(function () {
+                        alert('Data updated successfully.');
+                        getAllData();
+                        $('#formDetails')[0].reset();
+                    })
+                    .catch(function (error) {
+                        console.error('Error updating data:', error);
+                    });
+            } else {
+                console.log('Data does not exist.');
+            }
+        });
+    }
 
 $('#btnsearch').click(function(){
     var userId = $('#userId').val();
@@ -213,6 +275,7 @@ $('#btnsearch').click(function(){
     query.once('value',function (snapshot) {
             // Handle the snapshot
             var data= snapshot.val();
+           
                for (let i in data) {
                  if (data.hasOwnProperty(i)) {
                  let user = data[i];
@@ -220,6 +283,8 @@ $('#btnsearch').click(function(){
                 $('#lastName').val(user.lastname);
                 $('#age').val(user.age);
                 $('#address').val(user.address);
+                  $('#imageShow').append(`<img src="${user.image}" width="85px" style="margin-bottom: 6px; height: 90px; width: 90px" alt="">`);
+
             };
                };
         })

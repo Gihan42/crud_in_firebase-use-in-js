@@ -5,8 +5,7 @@
     text-align: center;
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: 45px;
-    margin-top: 1%;
+    margin-bottom: 40px;
 }
 .main{
     padding-left: 2%;
@@ -21,7 +20,7 @@
 .form-section{
     border-radius: 40px;
     width: 40%;
-    padding: 4%;
+    padding: 2%;
    
 }
 .title{
@@ -33,4 +32,14 @@
     width: 40%;
     margin-left: 10%;
    
+}
+#imageShow{
+    border: 1px solid red;
+    height: 100px;
+    width: 100px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    
 }
