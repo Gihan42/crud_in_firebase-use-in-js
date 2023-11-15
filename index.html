@@ -64,7 +64,14 @@
         </svg>
         got to excel sheet
     </button>
-
+    <button type="button" class="btn btn-danger mb-3" id="cvsBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
+            <path
+                d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z" />
+        </svg>
+        got to cvs sheet
+    </button>
                                             <table class="table" id="user">
                                                 <thead>
                                                     <tr>
@@ -333,7 +340,33 @@ $('#excelBtn').click(function(){
     XLSX.writeFile(workbook, 'table_data.xlsx');
 
 
-})
+});
+$('#cvsBtn').click(function(){
+    let csvContent = "data:text/csv;charset=utf-8,";
+
+    // Add header row
+    const headerRow = $("#user th").map(function () {
+        return $(this).text();
+    }).get();
+    csvContent += headerRow.join(",") + "\n";
+
+    // Add data rows
+    $("#user tbody tr").each(function () {
+        const dataRow = $(this).find("td").map(function () {
+            return $(this).text();
+        }).get();
+        csvContent += dataRow.join(",") + "\n";
+    });
+
+    // Create a data URI and initiate a download
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "data.csv");
+    document.body.appendChild(link); // Required for Firefox
+    link.click();
+    document.body.removeChild(link);
+});
 
    </script>
 
