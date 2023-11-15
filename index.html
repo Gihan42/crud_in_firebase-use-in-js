@@ -15,6 +15,7 @@
     <div class="form-section shadow-lg p-9 bg-body-tertiary rounded">
         <div class="title">
             <h1 style="margin-left: 2%; margin-bottom: 2%;">customer-manage</h1>
+            <div id="imageShow"></div>
         </div>
         <form action="" id ="formDetails">
                 <div class="mb-3 ">
@@ -44,8 +45,9 @@
                 </div>
                     <div class="mb-3">
                         <label for="image" class="form-label">upload image</label>
-                        <input type="file" class="form-control" id="imageInput">
+                        <input type="file" class="form-control" id="imageInput"> 
                     </div>
+
         <button type="button" class="btn btn-primary" id="submit">save</button>
         <button type="button" class="btn btn-success" id="btnupdate">update</button>
         <button type="button" class="btn btn-danger" id="btndelete">delete</button>
@@ -54,6 +56,15 @@
 </div>
 
 <div class="table-area">
+    <button type="button" class="btn btn-success mb-3" id="excelBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-excel-fill"
+            viewBox="0 0 16 16">
+            <path
+                d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM5.884 6.68 8 9.219l2.116-2.54a.5.5 0 1 1 .768.641L8.651 10l2.233 2.68a.5.5 0 0 1-.768.64L8 10.781l-2.116 2.54a.5.5 0 0 1-.768-.641L7.349 10 5.116 7.32a.5.5 0 1 1 .768-.64z" />
+        </svg>
+        got to excel sheet
+    </button>
+
                                             <table class="table" id="user">
                                                 <thead>
                                                     <tr>
@@ -62,31 +73,24 @@
                                                         <th >last name</th>
                                                         <th>age</th>
                                                         <th >address</th>
+                                                        <th>image</th>
                                                         
                                                     </tr>
                                                 </thead>
                                                 <tbody id="tbodyData">
                                             
                                                 </tbody>
-                                            
-                                            <!-- </table> -->
+                                       
                 </table>
 </div>
 </div>
     <script src="jquery-3.6.1.min.js"></script>
     <script src="./script/index.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/7.14.1-0/firebase.js"></script>
-        <!-- Firebase App (the core Firebase SDK) -->
-        <!-- <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-app.js"></script> -->
-
-        <!-- Firebase Storage -->
-        <!-- <script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-storage.js"></script>
-
-        <script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-app.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-database.js"></script> -->
-
         <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
         <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-storage.js"></script>
         <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database.js"></script>
@@ -95,6 +99,7 @@
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
     crossorigin="anonymous"></script>
 
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.3/xlsx.full.min.js"></script>
 
    <script type="module">
         // Import the functions you need from the SDKs you need
@@ -114,9 +119,10 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-
+    var database = firebase.database();
+    var details = firebase.database().ref('fire9db');
    
-   $(document).ready(function () {
+$(document).ready(function () {
          getAllData();
          $('#tbodyData > tr').click(function () {
             alert('click row')
@@ -137,16 +143,11 @@
        });
         });
    
-    var database = firebase.database();
-    var details=firebase.database().ref('fire9db');
-
-            
-
-    $('#submit').click(function () {
+$('#submit').click(function () {
         uploadImage();
     });
 
-    function uploadImage() {
+function uploadImage() {
         var fName = $('#firstName').val();
         var lName = $('#lastName').val();
         var age = $('#age').val();
@@ -174,7 +175,7 @@
         }
     }
 
-    function saveDataToDatabase(userId, fName, lName, age, add, imageUrl) {
+function saveDataToDatabase(userId, fName, lName, age, add, imageUrl) {
         // Get a reference to the database
         var database = firebase.database();
 
@@ -192,8 +193,6 @@
         console.log("Image URL and input value saved to the database");
     }
 
-  
-
 function getAllData() {
             details.once('value', function (snapshot) {
                 var data = snapshot.val();
@@ -201,22 +200,23 @@ function getAllData() {
                 for (let i in data) {
                     if (data.hasOwnProperty(i)) {
                         let user = data[i];
-                        $('#tbodyData').append(`<tr><td>` + user.id + `</td><td>` + user.firstname + `</td><td>` + user.lastname + `</td><td>` + user.age + `</td><td>` + user.address + `</td></tr>`);
+                        $('#tbodyData').append(`<tr><td>` + user.id + `</td><td>` + user.firstname + `</td><td>` + user.lastname + `</td><td>` + user.age + `</td><td>` + user.address + `</td><td>` + `<img src="${user.image}" width="35px" style=" border-radius: 50%; height: 33px; width: 33px" alt=""> ` + `</td><td>` + `</td></tr>`);
                     }
                 }
             });
         };
 
-    $('#btnupdate').click(function () {
+$('#btnupdate').click(function () {
         updateImageAndData();
     });
 
-    function updateImageAndData() {
+function updateImageAndData() {
         var fName = $('#firstName').val();
         var lName = $('#lastName').val();
         var age = $('#age').val();
         var add = $('#address').val();
         var userId = $('#userId').val();
+        
 
         var fileInput = document.getElementById("imageInput");
         var file = fileInput.files[0];
@@ -236,7 +236,7 @@ function getAllData() {
         }
     }
 
-    function updateDataToDatabase(userId, fName, lName, age, add, imageUrl) {
+function updateDataToDatabase(userId, fName, lName, age, add, imageUrl) {
         var query = details.orderByChild("id").equalTo(userId);
         query.once('value', function (snapshot) {
             if (snapshot.exists() ) {
@@ -275,7 +275,7 @@ $('#btnsearch').click(function(){
     query.once('value',function (snapshot) {
             // Handle the snapshot
             var data= snapshot.val();
-           
+           $('#imageShow').empty();
                for (let i in data) {
                  if (data.hasOwnProperty(i)) {
                  let user = data[i];
@@ -283,8 +283,9 @@ $('#btnsearch').click(function(){
                 $('#lastName').val(user.lastname);
                 $('#age').val(user.age);
                 $('#address').val(user.address);
-                  $('#imageShow').append(`<img src="${user.image}" width="85px" style="margin-bottom: 6px; height: 90px; width: 90px" alt="">`);
-
+                 $('#imageShow').append(`<img src="${user.image}" width="85px" style=" border-radius: 50%; height: 73px; width: 73px" alt="">`);
+                console.log(user.image)
+                 $('#imageInput').attr('src', user.image);
             };
                };
         })
@@ -315,6 +316,23 @@ $('#btndelete').click(function(){
 
         
     });
+})
+$('#excelBtn').click(function(){
+    // Get table data
+    var table = document.getElementById("user");
+    var rows = table.getElementsByTagName("tr");
+
+    // Create a new Excel Workbook
+    var workbook = XLSX.utils.book_new();
+    var worksheet = XLSX.utils.table_to_sheet(table);
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+    // Save the workbook as a file
+    XLSX.writeFile(workbook, 'table_data.xlsx');
+
+
 })
 
    </script>
